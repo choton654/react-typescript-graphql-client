@@ -5,6 +5,8 @@ import {
   FormErrorMessage,
   Input,
   Box,
+  Link,
+  Flex,
 } from "@chakra-ui/core";
 import * as React from "react";
 import { Formik, Field, Form } from "Formik";
@@ -14,6 +16,7 @@ import { useMutation } from "urql";
 import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/maperror";
 import { useRouter } from "next/router";
+import NextLink from "next/link";
 
 const Login: React.FunctionComponent<{}> = (props) => {
   const [, login] = useLoginMutation();
@@ -23,12 +26,15 @@ const Login: React.FunctionComponent<{}> = (props) => {
   return (
     <Wrapper varient="small">
       <Formik
-        initialValues={{ username: "", password: "" }}
+        initialValues={{ usernameOremail: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
           console.log(values);
-          const res = await login({ options: values });
+          const res = await login({
+            usernameOremail: values.usernameOremail,
+            password: values.password,
+          });
           if (res.data?.login.errors) {
-            console.log(res.data.login.errors);
+            // console.log(res.data.login.errors);
             setErrors(toErrorMap(res.data.login.errors));
           } else if (res.data?.login.user) {
             router.push("/");
@@ -38,9 +44,9 @@ const Login: React.FunctionComponent<{}> = (props) => {
         {({ isSubmitting }) => (
           <Form>
             <InputField
-              name="username"
-              label="Username"
-              placeholder="username"
+              name="usernameOremail"
+              label="Username Or Email"
+              placeholder="Username Or Email"
             />
             <Box mt={4}>
               <InputField
@@ -50,6 +56,11 @@ const Login: React.FunctionComponent<{}> = (props) => {
                 type="password"
               />
             </Box>
+            <Flex>
+              <NextLink href="/forgot-password">
+                <Link ml="auto">frogot-password?</Link>
+              </NextLink>
+            </Flex>
             <Button
               mt={4}
               variantColor="teal"

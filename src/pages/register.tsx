@@ -24,12 +24,12 @@ const Register: React.FunctionComponent<IRegisterProps> = (props) => {
   return (
     <Wrapper varient="small">
       <Formik
-        initialValues={{ username: "", password: "" }}
+        initialValues={{ email: "", username: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
           console.log(values);
-          const res = await register(values);
+          const res = await register({ options: values });
           if (res.data?.register.errors) {
-            console.log(res.data.register.errors);
+            // console.log(res.data.register.errors);
             setErrors(toErrorMap(res.data.register.errors));
           } else if (res.data?.register.user) {
             router.push("/");
@@ -43,6 +43,14 @@ const Register: React.FunctionComponent<IRegisterProps> = (props) => {
               label="Username"
               placeholder="username"
             />
+            <Box mt={4}>
+              <InputField
+                name="email"
+                label="Email"
+                placeholder="email"
+                type="email"
+              />
+            </Box>
             <Box mt={4}>
               <InputField
                 name="password"
