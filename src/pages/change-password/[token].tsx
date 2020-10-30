@@ -8,8 +8,10 @@ import { toErrorMap } from "../../utils/maperror";
 import { Formik, Field, Form } from "Formik";
 import { useChangePasswordMutation } from "../../generated/graphql";
 import { useRouter } from "next/router";
+import { withUrqlClient } from "next-urql";
+import { createUrqlClient } from "../../utils/urqlClient";
 
-const ChangePassword = ({ token }: any): ReactElement => {
+const ChangePassword = (): ReactElement => {
   const [, changePassword] = useChangePasswordMutation();
   const router = useRouter();
   return (
@@ -20,7 +22,8 @@ const ChangePassword = ({ token }: any): ReactElement => {
           console.log(values);
           const res = await changePassword({
             password: values.password,
-            token,
+            token:
+              typeof router.query.token === "string" ? router.query.token : "",
           });
           if (res.data?.changePassword.errors) {
             // console.log(res.data.changePassword.errors);
@@ -55,10 +58,4 @@ const ChangePassword = ({ token }: any): ReactElement => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  return {
-    props: { token: query.token },
-  };
-};
-
-export default ChangePassword;
+export default withUrqlClient(createUrqlClient)(ChangePassword);

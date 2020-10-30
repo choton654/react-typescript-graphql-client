@@ -17,6 +17,8 @@ import { useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/maperror";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
+import { withUrqlClient } from "next-urql";
+import { createUrqlClient } from "../utils/urqlClient";
 
 const Login: React.FunctionComponent<{}> = (props) => {
   const [, login] = useLoginMutation();
@@ -28,16 +30,18 @@ const Login: React.FunctionComponent<{}> = (props) => {
       <Formik
         initialValues={{ usernameOremail: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
-          console.log(values);
           const res = await login({
             usernameOremail: values.usernameOremail,
             password: values.password,
           });
           if (res.data?.login.errors) {
-            // console.log(res.data.login.errors);
             setErrors(toErrorMap(res.data.login.errors));
           } else if (res.data?.login.user) {
-            router.push("/");
+            if (typeof router.query.next === "string") {
+              router.push(router.query.next);
+            } else {
+              router.push("/");
+            }
           }
         }}
       >
@@ -75,5 +79,4 @@ const Login: React.FunctionComponent<{}> = (props) => {
     </Wrapper>
   );
 };
-
-export default Login;
+export default withUrqlClient(createUrqlClient, { ssr: false })(Login);
