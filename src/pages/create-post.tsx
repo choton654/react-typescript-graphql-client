@@ -8,28 +8,26 @@ import { useCreatePostMutation, useMeQuery } from "../generated/graphql";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { useIsAuth } from "../utils/useIsAuth";
-import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../utils/urqlClient";
 
 interface Props {}
 
 function CreatePost({}: Props): ReactElement {
-  const [, createPost] = useCreatePostMutation();
+  const [createPost] = useCreatePostMutation();
   const router = useRouter();
 
   useIsAuth();
   return (
-    <Wrapper varient="small">
+    <Wrapper variant="small">
       <Formik
         initialValues={{ title: "", text: "" }}
         onSubmit={async (values, { setErrors }) => {
-          const { error } = await createPost({ input: values });
+          const { errors } = await createPost({ variables: { input: values } });
           // if (error?.message.includes("not authenticated")) {
           //   router.push("/login");
           // } else {
           //   router.push("/");
           // }
-          if (!error) {
+          if (!errors) {
             router.push("/");
           }
         }}
@@ -59,4 +57,4 @@ function CreatePost({}: Props): ReactElement {
     </Wrapper>
   );
 }
-export default withUrqlClient(createUrqlClient, { ssr: false })(CreatePost);
+export default CreatePost;

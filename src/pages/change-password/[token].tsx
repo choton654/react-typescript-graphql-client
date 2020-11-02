@@ -8,22 +8,24 @@ import { toErrorMap } from "../../utils/maperror";
 import { Formik, Field, Form } from "Formik";
 import { useChangePasswordMutation } from "../../generated/graphql";
 import { useRouter } from "next/router";
-import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../../utils/urqlClient";
 
 const ChangePassword = (): ReactElement => {
-  const [, changePassword] = useChangePasswordMutation();
+  const [changePassword] = useChangePasswordMutation();
   const router = useRouter();
   return (
-    <Wrapper varient="small">
+    <Wrapper variant="small">
       <Formik
         initialValues={{ password: "" }}
         onSubmit={async (values, { setErrors }) => {
           console.log(values);
           const res = await changePassword({
-            password: values.password,
-            token:
-              typeof router.query.token === "string" ? router.query.token : "",
+            variables: {
+              password: values.password,
+              token:
+                typeof router.query.token === "string"
+                  ? router.query.token
+                  : "",
+            },
           });
           if (res.data?.changePassword.errors) {
             // console.log(res.data.changePassword.errors);
@@ -58,4 +60,4 @@ const ChangePassword = (): ReactElement => {
   );
 };
 
-export default withUrqlClient(createUrqlClient)(ChangePassword);
+export default ChangePassword;

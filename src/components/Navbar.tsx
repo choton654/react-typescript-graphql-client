@@ -1,20 +1,24 @@
 import { Box, Button, Flex, Link } from "@chakra-ui/core";
 import * as React from "react";
 import NextLink from "next/link";
-import { useLogoutMutation, useMeQuery } from "../generated/graphql";
+import { useLogoutMutation, useMeQuery, MeQuery } from "../generated/graphql";
 import { isServer } from "../utils/isServer";
+import { useApolloClient } from "@apollo/client";
 
 interface INavbarProps {}
 
 const Navbar: React.FunctionComponent<INavbarProps> = (props) => {
-  const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
-  const [{ data, fetching }] = useMeQuery({
-    pause: isServer(),
+  const [logout, { loading: logoutFetching }] = useLogoutMutation();
+  const { data, loading, error } = useMeQuery({
+    onError: (err) => console.log(err.message),
+    skip: isServer(),
   });
+
+  const apolloClient = useApolloClient();
 
   let body = null;
 
-  if (fetching) {
+  if (loading) {
   } else if (!data?.me) {
     body = (
       <>
@@ -26,7 +30,7 @@ const Navbar: React.FunctionComponent<INavbarProps> = (props) => {
         </NextLink>
       </>
     );
-  } else if (data.me) {
+  } else if (data && data.me) {
     body = (
       <Flex>
         <Box>
@@ -35,7 +39,10 @@ const Navbar: React.FunctionComponent<INavbarProps> = (props) => {
             ml={2}
             variant="link"
             isLoading={logoutFetching}
-            onClick={() => logout()}
+            onClick={async () => {
+              await logout();
+              await apolloClient.resetStore();
+            }}
           >
             logout
           </Button>

@@ -1,19 +1,21 @@
 import { Box } from "@chakra-ui/core";
 import * as React from "react";
 
-interface IWrapperProps {
-  varient?: "regular" | "small";
+export type WrapperVariant = "small" | "regular";
+
+interface WrapperProps {
+  variant?: WrapperVariant;
 }
 
-const Wrapper: React.FunctionComponent<IWrapperProps> = ({
-  varient = "regular",
+const Wrapper: React.FunctionComponent<WrapperProps> = ({
+  variant = "regular",
   children,
 }) => {
   return (
     <Box
       mt={8}
       mx={"auto"}
-      maxW={varient === "regular" ? "800px" : "400px"}
+      maxW={variant === "regular" ? "800px" : "400px"}
       w="100%"
     >
       {children}

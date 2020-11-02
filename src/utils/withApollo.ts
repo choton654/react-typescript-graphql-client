@@ -1,8 +1,5 @@
-import { ThemeProvider, CSSReset } from "@chakra-ui/core";
-import theme from "../theme";
-import { Layout } from "../components/Layout";
+import { withApollo as createWithApollo } from "next-apollo";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
-import { ApolloProvider } from "@apollo/client";
 import { PginatePosts } from "../generated/graphql";
 
 const client = new ApolloClient({
@@ -30,17 +27,4 @@ const client = new ApolloClient({
   }),
 });
 
-function MyApp({ Component, pageProps }: any) {
-  return (
-    <ApolloProvider client={client}>
-      <ThemeProvider theme={theme}>
-        <CSSReset />
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
-      </ThemeProvider>
-    </ApolloProvider>
-  );
-}
-
-export default MyApp;
+export const withApollo = createWithApollo(client);

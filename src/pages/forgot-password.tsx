@@ -12,16 +12,16 @@ interface IForgotPasswordProps {}
 const ForgotPassword: React.FunctionComponent<IForgotPasswordProps> = (
   props
 ) => {
-  const [, forgetPassword] = useForgotPasswordMutation();
+  const [forgetPassword] = useForgotPasswordMutation();
 
   const [complete, setcomplete] = React.useState(false);
 
   return (
-    <Wrapper varient="small">
+    <Wrapper variant="small">
       <Formik
         initialValues={{ email: "" }}
         onSubmit={async (values, { setErrors }) => {
-          const res = await forgetPassword(values);
+          const res = await forgetPassword({ variables: values });
           setcomplete(true);
         }}
       >

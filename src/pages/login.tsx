@@ -12,27 +12,36 @@ import * as React from "react";
 import { Formik, Field, Form } from "Formik";
 import Wrapper from "../components/Wrapper";
 import InputField from "../components/InputField";
-import { useMutation } from "urql";
-import { useLoginMutation } from "../generated/graphql";
+import { MeDocument, MeQuery, useLoginMutation } from "../generated/graphql";
 import { toErrorMap } from "../utils/maperror";
 import { useRouter } from "next/router";
 import NextLink from "next/link";
-import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../utils/urqlClient";
 
 const Login: React.FunctionComponent<{}> = (props) => {
-  const [, login] = useLoginMutation();
+  const [login] = useLoginMutation();
 
   const router = useRouter();
 
   return (
-    <Wrapper varient="small">
+    <Wrapper variant="small">
       <Formik
         initialValues={{ usernameOremail: "", password: "" }}
         onSubmit={async (values, { setErrors }) => {
           const res = await login({
-            usernameOremail: values.usernameOremail,
-            password: values.password,
+            variables: {
+              usernameOremail: values.usernameOremail,
+              password: values.password,
+            },
+            update: (cache, { data }) => {
+              cache.writeQuery<MeQuery>({
+                query: MeDocument,
+                data: {
+                  __typename: "Query",
+                  me: data?.login.user,
+                },
+              });
+              cache.evict({ fieldName: "posts:{}" });
+            },
           });
           if (res.data?.login.errors) {
             setErrors(toErrorMap(res.data.login.errors));
@@ -79,4 +88,4 @@ const Login: React.FunctionComponent<{}> = (props) => {
     </Wrapper>
   );
 };
-export default withUrqlClient(createUrqlClient, { ssr: false })(Login);
+export default Login;
