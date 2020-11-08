@@ -1,6 +1,7 @@
 import React from "react";
 import Wrapper, { WrapperVariant } from "./Wrapper";
 import NavBar from "./Navbar";
+import { User } from "../generated/graphql";
 
 interface LayoutProps {
   variant?: WrapperVariant;

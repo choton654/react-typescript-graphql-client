@@ -2,12 +2,11 @@ import { Box, Flex, Link, Button } from "@chakra-ui/core";
 import React, { ReactElement } from "react";
 import InputField from "../components/InputField";
 import Wrapper from "../components/Wrapper";
-import { toErrorMap } from "../utils/maperror";
 import { Formik, Field, Form } from "Formik";
 import { useCreatePostMutation, useMeQuery } from "../generated/graphql";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
 import { useIsAuth } from "../utils/useIsAuth";
+import { withApollo } from "../utils/withApollo";
 
 interface Props {}
 
@@ -21,7 +20,12 @@ function CreatePost({}: Props): ReactElement {
       <Formik
         initialValues={{ title: "", text: "" }}
         onSubmit={async (values, { setErrors }) => {
-          const { errors } = await createPost({ variables: { input: values } });
+          const { errors } = await createPost({
+            variables: { input: values },
+            update: (cache) => {
+              cache.evict({ fieldName: "posts:{}" });
+            },
+          });
           // if (error?.message.includes("not authenticated")) {
           //   router.push("/login");
           // } else {
@@ -57,4 +61,4 @@ function CreatePost({}: Props): ReactElement {
     </Wrapper>
   );
 }
-export default CreatePost;
+export default withApollo({ ssr: false })(CreatePost);

@@ -1,11 +1,20 @@
-import { usePostsQuery } from "../generated/graphql";
-import { Link, Stack, Heading, Text, Box, Flex, Button } from "@chakra-ui/core";
+import { Box, Button, Flex, Heading, Link, Stack, Text } from "@chakra-ui/core";
 import NextLink from "next/link";
 import React from "react";
-import { Layout } from "../components/Layout";
+import EditDeletePostButtons from "../components/EditDeletePostButtons";
+import UpdootSection from "../components/UpdootSection";
+import {
+  useMeQuery,
+  usePostsQuery,
+  PostsDocument,
+  Post,
+} from "../generated/graphql";
+import { initializeApollo } from "../lib/apolloClient";
 import { withApollo } from "../utils/withApollo";
 
-const Index = () => {
+interface Props {}
+
+const Index = ({}: Props) => {
   const { data, error, loading, fetchMore, variables } = usePostsQuery({
     variables: { limit: 10, cursor: null },
     notifyOnNetworkStatusChange: true,
@@ -21,22 +30,30 @@ const Index = () => {
 
   return (
     <div>
-      <Flex align="center">
-        <Heading>LiReddit</Heading>
-        <NextLink href="/create-post">
-          <Link ml="auto">create post</Link>
-        </NextLink>
-      </Flex>
-      <br />
       {!data && loading ? (
         <div>loading...</div>
       ) : (
         <Stack spacing={8}>
           {data!.posts.posts.map((p) => (
-            <Box key={p.id} p={5} shadow="md" borderWidth="1px">
-              <Heading fontSize="xl">{p.title}</Heading>
-              <Text mt={4}>{p.textSnippest}</Text>
-            </Box>
+            <Flex key={p._id} p={5} shadow="md" borderWidth="1px">
+              <UpdootSection post={p} />
+              <Box flex={1}>
+                <NextLink href={`/post/${p._id}`}>
+                  <Link ml="auto">
+                    <Heading fontSize="xl">{p.title}</Heading>
+                  </Link>
+                </NextLink>
+                <Text>Posted By {p.creator?.username}</Text>
+                <Flex align="center">
+                  <Text flex={1} mt={4}>
+                    {p.textSnippest}
+                  </Text>
+                  <Box ml="auto">
+                    <EditDeletePostButtons id={p._id} creatorId={p.creatorId} />
+                  </Box>
+                </Flex>
+              </Box>
+            </Flex>
           ))}
         </Stack>
       )}
@@ -65,4 +82,31 @@ const Index = () => {
 };
 
 export default withApollo({ ssr: true })(Index);
+
+// export async function getServerSideProps() {
+//   const apolloClient = initializeApollo();
+
+//   const res = await apolloClient.query({
+//     query: PostsDocument,
+//     variables: { limit: 10, cursor: null },
+//   });
+
+//   const state = apolloClient.cache.extract();
+//   // console.log("response", res);
+//   // console.log("cache", state);
+
+//   return {
+//     props: {
+//       data: res,
+//       initialApolloState: state,
+//     }, // will be passed to the page component as props
+//   };
+// }
+
+// export async function getServerSideProps() {
+//   return {
+//     props: { test: "hello" }, // will be passed to the page component as props
+//   };
+// }
+
 // export default Index;

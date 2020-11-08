@@ -6,6 +6,7 @@ import { toErrorMap } from "../utils/maperror";
 import { Formik, Field, Form } from "Formik";
 import NextLink from "next/link";
 import { useForgotPasswordMutation } from "../generated/graphql";
+import { withApollo } from "../utils/withApollo";
 
 interface IForgotPasswordProps {}
 
@@ -54,4 +55,6 @@ const ForgotPassword: React.FunctionComponent<IForgotPasswordProps> = (
   );
 };
 
-export default ForgotPassword;
+export default withApollo({ ssr: false })(ForgotPassword);
+
+// export default ForgotPassword;

@@ -20,8 +20,7 @@
     "next-apollo": "^5.0.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "react-is": "^17.0.1",
-    "wonka": "^4.0.15"
+    "react-is": "^17.0.1"
   },
   "license": "MIT",
   "devDependencies": {

@@ -8,6 +8,7 @@ import { toErrorMap } from "../../utils/maperror";
 import { Formik, Field, Form } from "Formik";
 import { useChangePasswordMutation } from "../../generated/graphql";
 import { useRouter } from "next/router";
+import { withApollo } from "../../utils/withApollo";
 
 const ChangePassword = (): ReactElement => {
   const [changePassword] = useChangePasswordMutation();
@@ -60,4 +61,6 @@ const ChangePassword = (): ReactElement => {
   );
 };
 
-export default ChangePassword;
+export default withApollo({ ssr: false })(ChangePassword);
+
+// export default ChangePassword;
